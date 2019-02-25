@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='VA.css') }}">
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+   <script src="{{ url_for('static', filename='plot.js') }}"></script>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="{{ url_for('static', filename='cluster.js') }}"></script>
+  
+</head>
+
+<body>
+<div class="list_container ml-input-container">
+	<h3 style="width: 100%;">Clusters of Document Id's</h3>
+<!--	<input id="myInput" class="ml-input-filter" type="text" placeholder="Filter" >-->
+	<hr>
+	<ul id="sortable">
+	  {% for key in rows.keys(): %}
+		<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+			<h3 onclick="test1(this)">Cluster {{loop.index}}</h3>
+			<ul id="sortable">
+			{% for a in rows[key]: %}
+				<li class="ui-state-default"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+					<label><input type="checkbox" name="colorCheckbox" value="{{a}}">{{a}}</label>
+				</li>
+			{% endfor %}
+			</ul>
+		</li>
+	  {% endfor %}
+	</ul>
+</div>
+
+<div id="scatterPlot" class="list_container work" style="padding-top: 12px;">
+   <h2 style="background-color: #ff6a00;
+    padding: 5px;
+    border-radius: 5px;
+    color: white;">MDS</h2>
+   <div id="plot-content">
+	</div>
+</div>
+</body> 
+
+	
+<div id="contentDiv" class="list_container work">
+   <h2 style="background-color: #ff6a00;
+    padding: 5px;
+    border-radius: 5px;
+    color: white;">Workspace</h2>
+   <div class="row_position">
+	{% for val in descriptions: %}
+	<li  class="{{val[1]}} box">
+		<p style="background-color: lightgoldenrodyellow; padding: 15px;">{{val[2]}}</p>
+	</li>
+	{% endfor %}
+	</div>
+</div>
+
+<script type="text/javascript">
+	window.addEventListener('load', () => {
+		
+		/* Draws the graph */
+	
+		let plotdata = {{ plotdata | safe}};
+		let act = [...new Set([...document.querySelectorAll('input')].map(e => e.value))];
+		plotdata = plotdata.filter(data => act.indexOf(data[2]) !== -1);
+	
+		let container = document.querySelector('#plot-content');
+	
+		container.setAttribute('style', `margin-top:12px;height: ${container.clientWidth * (3 / 4)}px;`);
+	
+		createScatterPlot(document.querySelector('#plot-content'), plotdata, '', '');
+	});
+    </script>
+</body> 
+
+ 
+
+
+
+<script> 
+   $('input:checkbox').change(function(){
+   if($(this).is(':checked')) 
+       $(this).parent().addClass('active'); 
+  else 
+      $(this).parent().removeClass('active')
+ }); 
+</script>
+
+<!-----------------------------------text movable script----------------------------------------->
+<script type="text/javascript">
+    $( ".row_position" ).sortable({
+        delay: 150,
+        stop: function() {
+            var selectedData = new Array();
+            $('.row_position>li').each(function() {
+                selectedData.push($(this).attr("id"));
+            });
+        }
+    });
+</script>
+</html>
